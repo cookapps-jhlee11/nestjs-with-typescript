@@ -1,7 +1,81 @@
 # namespace
 apiVersion: v1
 kind: Namespace
-metadata: nest-server
+metadata:
+  name: nest-server
 ---
-#pod
+#deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: nest-server
+  name: nestjs-deploy
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nestjs
+      tier: app
+  template:
+    metadata:
+      labels:
+        app: nestjs
+        tier: app
+    spec:
+      containers:
+        - name: nestjs
+          image: 060897572144.dkr.ecr.ap-northeast-2.amazonaws.com/nestjs-with-typescript:latest
+          imagePullPolicy: Always
+          ports:
+            - name: nestjs-port
+              containerPort: 3000
+
+---
+#service
 apiVersion: v1
+kind: Service
+metadata:
+  name: nestjs-service
+  
+spec:
+  type: NodePort
+  ports:
+    - port: 3000
+      targetPort: 3000
+      protocol: TCP
+  selector:
+    app: nestjs
+    tier: app
+
+---
+#ingress
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nestjs-ingress
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
+    alb.ingress.kubernetes.io/ssl-redirect: '443'
+  namespace: nest-server
+  labels:
+    app: nestjs
+    tier: app
+spec:
+  rules:
+    - host: nestjs.tech.cookapps.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: "nestjs-service"
+                port:
+                  number: 3000
+
+
+
+
