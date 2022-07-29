@@ -54,11 +54,10 @@ jobs:
       - name: Install kubectl
         run: |
           curl -LO "https://dl.k8s.io/release/v1.23.0/bin/linux/amd64/kubectl"
-          echo "DEBUG: KUBECTL DOWNLOADED"
           chmod +x kubectl
           mkdir -p ~/.local/bin
           mv ./kubectl ~/.local/bin/
-          export ${HOME}/.local/bin:$PATH
+          #export ${HOME}/.local/bin:$PATH  this path aleady exists
           echo `kubectl version --client`
 
       - name:  EKS cluster
