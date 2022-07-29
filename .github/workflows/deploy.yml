@@ -1,0 +1,10 @@
+on: push
+name: deploy
+jobs:
+  deploy:
+    name: deploy to EKS
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: action?checkout@v2:w
+
