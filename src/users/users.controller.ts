@@ -2,7 +2,9 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, BadRequestException 
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { HttpCode } from '@nestjs/common'
+import { HttpCode } from '@nestjs/common';
+import { Header } from '@nestjs/common';
+import { Redirect } from '@nestjs/common';
 
 @Controller('users')
 export class UsersController {
@@ -10,14 +12,18 @@ export class UsersController {
 
     @Post()
     create(@Body() createUserDto: CreateUserDto) {
-        return this.usersService.create(createUserDto);
+        const { name, email } = createUserDto;
+        return `유저를 생성했습니다.이름 : ${name}, 이메일: ${email}`;
+        //return this.usersService.create(createUserDto);
     }
-
+    
+    @Redirect('https://nestjs.com', 301)
     @Get()
     findAll() {
         return this.usersService.findAll();
     }
-
+    
+    @Header('Custom', 'Test Header')
     @Get(':id')
     findOne(@Param('id') id: string) {
         if (+id < 1){
@@ -36,4 +42,18 @@ export class UsersController {
     remove(@Param('id') id: string) {
         return this.usersService.remove(+id);
     }
+
+    @Delete(':userId/memo/:memoId')
+    deleteUserMemo(
+        @Param('userId') userId: string,
+        @Param('memoId') memoId: string,
+    ){
+        return `userId: ${userId}, memoId: ${memoId}`;
+    }
+//    @Delete(':userId/memo/:memoId')
+//    deleteUserMemo(@Param() params: { [key: string]: string} ){
+//        return `userId: ${params.userId}, memoId: ${params.memoId} `;
+//    }
+
+
 }

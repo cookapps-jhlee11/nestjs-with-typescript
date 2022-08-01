@@ -1,35 +1,39 @@
 import { BadRequestException } from '@nestjs/common';
 
 function MinLength(min: number) {
-  return function (target: any, propertyKey: string, parameterIndex: number) {
-    target.validators = {
-      minLength: function (args: string[]) {
-        return args[parameterIndex].length >= min;
-      }
+    return function (target: any, propertyKey: string, parameterIndex: number) {
+        console.dir("First: " + target);
+        console.log("Second: " + propertyKey);
+        console.log("Third: " + parameterIndex);
+
+        target.validators = {
+            minLength: function (args: string[]) {
+                return args[parameterIndex].length >= min;
+            }
+        }
     }
-  }
 }
 
 function Validate(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
-  const method = descriptor.value;
+    const method = descriptor.value;
 
-  descriptor.value = function(...args) {
-    Object.keys(target.validators).forEach(key => {
-      if (!target.validators[key](args)) {
-        throw new BadRequestException();
-      }
-    })
-    method.apply(this, args);
-  }
+    descriptor.value = function(...args) {
+        Object.keys(target.validators).forEach(key => {
+            if (!target.validators[key](args)) {
+                throw new BadRequestException();
+            }
+        })
+        method.apply(this, args);
+    }
 }
 
 class User {
-  private name: string;
+    private name: string;
 
-  @Validate
-  setName(@MinLength(3) name: string) {
-    this.name = name;
-  }
+    @Validate
+    setName(@MinLength(3) name: string) {
+        this.name = name;
+    }
 }
 
 const tt= new User();

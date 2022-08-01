@@ -12,44 +12,22 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.ApiController = void 0;
 const common_1 = require("@nestjs/common");
-function MinLength(min) {
-    return function (target, propertyKey, parameterIndex) {
-        console.dir("First: " + target);
-        console.log("Second: " + propertyKey);
-        console.log("Third: " + parameterIndex);
-        target.validators = {
-            minLength: function (args) {
-                return args[parameterIndex].length >= min;
-            }
-        };
-    };
-}
-function Validate(target, propertyKey, descriptor) {
-    const method = descriptor.value;
-    descriptor.value = function (...args) {
-        Object.keys(target.validators).forEach(key => {
-            if (!target.validators[key](args)) {
-                throw new common_1.BadRequestException();
-            }
-        });
-        method.apply(this, args);
-    };
-}
-class User {
-    setName(name) {
-        this.name = name;
+let ApiController = class ApiController {
+    index(version) {
+        return `Hello, API ${version}`;
     }
-}
+};
 __decorate([
-    Validate,
-    __param(0, MinLength(3)),
+    (0, common_1.Get)(),
+    __param(0, (0, common_1.HostParam)('version')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
-], User.prototype, "setName", null);
-const tt = new User();
-tt.setName('Dexter');
-console.log('----------');
-tt.setName('De');
-//# sourceMappingURL=paramDecorator.js.map
+    __metadata("design:returntype", String)
+], ApiController.prototype, "index", null);
+ApiController = __decorate([
+    (0, common_1.Controller)({ host: ':version.api.localhost' })
+], ApiController);
+exports.ApiController = ApiController;
+//# sourceMappingURL=api.controller.js.map
